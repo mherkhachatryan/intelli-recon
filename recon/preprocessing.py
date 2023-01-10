@@ -98,7 +98,7 @@ class Preprocess:
         -------
         DataFrame of patch information
         """
-        if mode.lower() == "train":
+        if mode.lower() in ["train", "valid"]:
             image_1, image_2, label = self.get_all_image_pairs_paths(self.train_city_names)
         elif mode.lower() == "test":
             raise NotImplemented("Waiting for train")

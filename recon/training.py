@@ -1,14 +1,18 @@
 import torch
+from torch.utils.data import Dataset
 from dataclasses import dataclass
 from torch import nn
 from tqdm import tqdm
 import numpy as np
 from datetime import datetime
 from torchmetrics.classification import BinaryJaccardIndex
+from natsort import natsorted
 
 from typing import Tuple
+import os
+import glob
 
-from configs import neptune_logger, tb_writer
+from configs import neptune_logger, tb_writer, log_path
 
 
 @dataclass
@@ -43,6 +47,9 @@ class TrainChangeDetection:
         self.val_loader = val_loader
         self.metric = BinaryJaccardIndex(threshold=0.5)
 
+        self.model_save_path = log_path / "model"
+
+        os.makedirs(self.model_save_path, exist_ok=True)
         neptune_logger["config/criterion"] = type(self.loss).__name__
         neptune_logger["config/optimizer"] = type(self.optimizer).__name__
 
@@ -138,6 +145,32 @@ class TrainChangeDetection:
             if avg_val_loss < best_val_loss:
                 best_val_loss = avg_val_loss
                 # TODO save in predefined folder
-                model_path = f'model_{timestamp}_{epoch}.pth'
-                torch.save(self.model.state_dict(), model_path)
-                neptune_logger["model_weights"].upload(f"{model_path}")
+                model_name = f'cd_{timestamp}_{epoch}.pth'
+                torch.save(self.model.state_dict(), self.model_save_path / model_name)
+                neptune_logger["model_weights"].upload(f"{model_name}")
+
+    def predict(self, dataset: Dataset = None, sample: int = 42):
+        self._check_if_trained()
+        self.model.eval()
+        with torch.no_grad():
+            input_image_1 = dataset[sample][0].unsqueeze(dim=0).to(self.device)
+            input_image_2 = dataset[sample][1].unsqueeze(dim=0).to(self.device)
+            logits = self.model(input_image_1, input_image_2)
+
+            prediction_mask = torch.sigmoid(logits).squeeze()
+
+            return prediction_mask
+
+    def load_model(self, path: str):
+        self.model.load_state_dict(torch.load(path))
+
+    def _check_if_trained(self):
+        if self.model.requires_grad_:
+            # model is not trained, trying to load
+            model_paths = natsorted(glob.glob(str(self.model_save_path / "*.pth")))
+            if bool(model_paths):
+                print("Loading latest model")
+                latest_model_path = model_paths[-1]
+            else:
+                raise RuntimeError(f"Could not load model, there is no *pth model in {self.model_save_path}")
+            self.load_model(latest_model_path)

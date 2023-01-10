@@ -1,14 +1,12 @@
 from torch.utils.data import DataLoader
-from pathlib import Path
 from sklearn.model_selection import train_test_split
-import torchvision
 
 from configs import *
 from preprocessing import SentinelDataset, Preprocess
 from model import ChangeNet
 from training import TrainChangeDetection, TrainParameters
+from utils import show_tensor
 
-data_path = Path(data_path)
 proc = Preprocess(data_path)
 patches_df = proc.image_patches(mode=MODE)
 
@@ -30,13 +28,23 @@ model = ChangeNet(model_name=MODEL_NAME)
 dataiter = iter(train_loader)
 image_1, image_2, label = next(dataiter)
 
-
 tb_writer.add_graph(model, (image_1, image_2))
 tb_writer.close()
 neptune_logger["config/model"] = type(model).__name__
 
-if MODE == "train":
-    train_params = TrainParameters(model=model, _loss=LOSS, _optimizer=OPTIMIZER, epochs=EPOCHS)
-    training = TrainChangeDetection(train_params, train_loader, val_loader)
+train_params = TrainParameters(model=model, _loss=LOSS, _optimizer=OPTIMIZER, epochs=EPOCHS)
+training = TrainChangeDetection(train_params, train_loader, val_loader)
 
+if MODE == "train":
     training.train()
+
+elif MODE == "valid":
+    if show_examples:
+        sample = 4
+        image_1 = val_ds[sample][0]
+        image_2 = val_ds[sample][1]
+        gd = val_ds[sample][2]
+        training.load_model("/Users/mher/Codes/ASDS21-CV/intelli-recon/logs/model/model_20230109_194445_14.pth")
+        mask = training.predict(val_ds, sample=sample)
+
+        show_tensor([image_1, image_2, gd, mask], grid=True)
