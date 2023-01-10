@@ -32,4 +32,4 @@ class ChangeNet(nn.Module):
 
         segmentation_result = self.head(decoder_output)
 
-        return segmentation_result
+        return torch.sigmoid(segmentation_result)

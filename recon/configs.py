@@ -17,7 +17,7 @@ OUTPUT_SHAPE = (512, 512)  # do not change for now
 BATCH_SIZE = 64
 EPOCHS = 15
 VALID_SIZE = 0.2
-LOSS = "BCEWithLogitsLoss"  # do not change for now
+LOSS = "BCELoss"  # do not change for now
 OPTIMIZER = "adam"  # do not change for now
 
 # MODEL PARAMETERS
@@ -40,7 +40,6 @@ neptune_logger = neptune.init_run(
 
 neptune_logger["config/dataset/path"] = data_path
 
-experiment_name = "kaggle_experiment_depth_5"
 tb_writer = SummaryWriter(f'logs/runs/{experiment_name}')
 
 
@@ -55,6 +54,8 @@ class TrainParameters:
     def loss(self):
         if self._loss == "BCEWithLogitsLoss":
             return nn.BCEWithLogitsLoss()
+        elif self._loss == "BCELoss":
+            return nn.BCELoss()
         else:
             raise ValueError(f"Invalid loss function: {self._loss}")
 
