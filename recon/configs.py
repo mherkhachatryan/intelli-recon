@@ -1,17 +1,28 @@
 import neptune.new as neptune
+import torch
+from dataclasses import dataclass, field
+from torch import nn
 from torch.utils.tensorboard import SummaryWriter
 import os
 from pathlib import Path
 
-MODE = "train"
+from typing import List
+
+MODE = "train"  # valid, test, train
 show_examples = True
 OUTPUT_SHAPE = (512, 512)  # do not change for now
-MODEL_NAME = "resnet18"
+
+# training parameters
 BATCH_SIZE = 64
 EPOCHS = 15
 VALID_SIZE = 0.2
 LOSS = "BCEWithLogitsLoss"  # do not change for now
 OPTIMIZER = "adam"  # do not change for now
+
+# MODEL PARAMETERS
+MODEL_NAME = "resnet18"
+ENCODER_DEPTH = 5
+DECODER_CHANNELS = [256, 128, 64, 32, 16]
 
 data_path = Path("/Users/mher/Codes/ASDS21-CV/intelli-recon/data")
 log_path = Path("/Users/mher/Codes/ASDS21-CV/intelli-recon/logs/")
@@ -28,4 +39,32 @@ neptune_logger = neptune.init_run(
 
 neptune_logger["config/dataset/path"] = data_path
 
-tb_writer = SummaryWriter('logs/runs/recon_kaggle_experiment')
+experiment_name = "kaggle_experiment_depth_5"
+tb_writer = SummaryWriter(f'logs/runs/{experiment_name}')
+
+
+@dataclass
+class TrainParameters:
+    model: nn.Module = None
+    _loss: str = "BCEWithLogitsLoss"
+    _optimizer: str = "adam"
+    epochs: int = 5
+
+    @property
+    def loss(self):
+        if self._loss == "BCEWithLogitsLoss":
+            return nn.BCEWithLogitsLoss()
+        else:
+            raise ValueError(f"Invalid loss function: {self._loss}")
+
+    @property
+    def optimizer(self):
+        if self._optimizer.lower() == "adam":
+            return torch.optim.Adam(self.model.parameters(), lr=0.0001)
+
+
+@dataclass
+class ModelParameters:
+    model_name: str = "resnet18"
+    encoder_depth: int = 3
+    decoder_channels: List[int] = field(default_factory=lambda: [64, 64, 16])  # TODO LENGTH MUST BE ENCODER_DEPTH

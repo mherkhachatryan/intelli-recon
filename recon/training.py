@@ -1,7 +1,5 @@
 import torch
 from torch.utils.data import Dataset
-from dataclasses import dataclass
-from torch import nn
 from tqdm import tqdm
 import numpy as np
 from datetime import datetime
@@ -12,27 +10,7 @@ from typing import Tuple
 import os
 import glob
 
-from configs import neptune_logger, tb_writer, log_path
-
-
-@dataclass
-class TrainParameters:
-    model: nn.Module = None
-    _loss: str = "BCEWithLogitsLoss"
-    _optimizer: str = "adam"
-    epochs: int = 5
-
-    @property
-    def loss(self):
-        if self._loss == "BCEWithLogitsLoss":
-            return nn.BCEWithLogitsLoss()
-        else:
-            raise ValueError(f"Invalid loss function: {self._loss}")
-
-    @property
-    def optimizer(self):
-        if self._optimizer.lower() == "adam":
-            return torch.optim.Adam(self.model.parameters(), lr=0.0001)
+from configs import neptune_logger, tb_writer, log_path, TrainParameters
 
 
 class TrainChangeDetection:
@@ -50,8 +28,6 @@ class TrainChangeDetection:
         self.model_save_path = log_path / "model"
 
         os.makedirs(self.model_save_path, exist_ok=True)
-        neptune_logger["config/criterion"] = type(self.loss).__name__
-        neptune_logger["config/optimizer"] = type(self.optimizer).__name__
 
     def _train_one_epoch(self, epoch_idx: int) -> Tuple[float, float]:
         running_loss = 0.

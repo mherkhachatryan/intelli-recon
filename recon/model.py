@@ -2,13 +2,18 @@ from torch import nn
 import segmentation_models_pytorch as smp
 import torch
 
+from configs import ModelParameters
+
 
 class ChangeNet(nn.Module):
 
-    def __init__(self, model_name: str = "resnet16"):
+    def __init__(self, model_params: ModelParameters):
         super().__init__()
-
-        model = smp.Unet(model_name, encoder_depth=3, decoder_channels=[64, 64, 16])  # TODO move params to config
+        self._model_name = model_params.model_name
+        self._encoder_depth = model_params.encoder_depth
+        self._decoder_channels = model_params.decoder_channels
+        model = smp.Unet(self._model_name, encoder_depth=self._encoder_depth,
+                         decoder_channels=self._decoder_channels)
 
         self.encoder = model.encoder
         self.decoder = model.decoder
