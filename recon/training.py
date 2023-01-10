@@ -12,7 +12,7 @@ from typing import Tuple
 import os
 import glob
 
-from configs import neptune_logger, tb_writer, log_path
+from configs import tb_writer, log_path
 
 
 @dataclass
@@ -50,8 +50,6 @@ class TrainChangeDetection:
         self.model_save_path = log_path / "model"
 
         os.makedirs(self.model_save_path, exist_ok=True)
-        neptune_logger["config/criterion"] = type(self.loss).__name__
-        neptune_logger["config/optimizer"] = type(self.optimizer).__name__
 
     def _train_one_epoch(self, epoch_idx: int) -> Tuple[float, float]:
         running_loss = 0.
@@ -130,24 +128,16 @@ class TrainChangeDetection:
             tb_writer.add_scalar('validation iou',
                                  avg_val_iou,
                                  epoch)
-            neptune_logger["training/loss/train"].log(avg_train_loss)
-            neptune_logger["training/loss/valid"].log(avg_val_loss)
-
             tb_writer.add_scalar('training loss',
                                  avg_train_loss,
                                  epoch)
             tb_writer.add_scalar('training iou',
                                  avg_train_iou,
                                  epoch)
-            neptune_logger["training/iou/train"].log(avg_train_iou)
-            neptune_logger["training/iou/valid"].log(avg_val_iou)
-
             if avg_val_loss < best_val_loss:
                 best_val_loss = avg_val_loss
-                # TODO save in predefined folder
                 model_name = f'cd_{timestamp}_{epoch}.pth'
                 torch.save(self.model.state_dict(), self.model_save_path / model_name)
-                neptune_logger["model_weights"].upload(f"{model_name}")
 
     def predict(self, dataset: Dataset = None, sample: int = 42):
         self._check_if_trained()

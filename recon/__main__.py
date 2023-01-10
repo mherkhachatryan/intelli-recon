@@ -12,9 +12,6 @@ patches_df = proc.image_patches(mode=MODE)
 
 patches_df_train, patches_df_test = train_test_split(patches_df, test_size=VALID_SIZE)
 
-neptune_logger["config/dataset/train_size"] = len(patches_df_train)
-neptune_logger["config/dataset/valid_size"] = len(patches_df_test)
-
 # resetting index here so Dataset length and indexing is done correctly
 train_ds = SentinelDataset(patches_df_train.reset_index(drop=True), output_shape=OUTPUT_SHAPE)
 val_ds = SentinelDataset(patches_df_test.reset_index(drop=True), output_shape=OUTPUT_SHAPE)
@@ -30,7 +27,6 @@ image_1, image_2, label = next(dataiter)
 
 tb_writer.add_graph(model, (image_1, image_2))
 tb_writer.close()
-neptune_logger["config/model"] = type(model).__name__
 
 train_params = TrainParameters(model=model, _loss=LOSS, _optimizer=OPTIMIZER, epochs=EPOCHS)
 training = TrainChangeDetection(train_params, train_loader, val_loader)
