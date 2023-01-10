@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import List
 
 MODE = "train"  # valid, test, train
+MODEL_PATH = "/Users/mher/Codes/ASDS21-CV/intelli-recon/logs/model/kaggle_experiment_depth_3/cd_20230110_163308_1.pth"  # is not u
 show_examples = True
 OUTPUT_SHAPE = (512, 512)  # do not change for now
 

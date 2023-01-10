@@ -50,7 +50,7 @@ elif MODE == "valid":
         image_1 = val_ds[sample][0]
         image_2 = val_ds[sample][1]
         gd = val_ds[sample][2]
-        training.load_model("/Users/mher/Codes/ASDS21-CV/intelli-recon/logs/model/model_20230109_194445_14.pth")
+        training.load_model(MODEL_PATH)
         mask = training.predict(val_ds, sample=sample)
 
         show_tensor([image_1, image_2, gd, mask], grid=True)
