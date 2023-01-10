@@ -45,7 +45,7 @@ if MODE == "train":
     training.train()
 
 elif MODE == "valid":
-    if show_examples:
+    if show_examples:  # TODO add tensorboard
         sample = 4
         image_1 = val_ds[sample][0]
         image_2 = val_ds[sample][1]

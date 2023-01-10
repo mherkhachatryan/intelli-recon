@@ -9,13 +9,14 @@ from pathlib import Path
 from typing import List
 
 MODE = "train"  # valid, test, train
-MODEL_PATH = "/Users/mher/Codes/ASDS21-CV/intelli-recon/logs/model/kaggle_experiment_depth_3/cd_20230110_163308_1.pth"  # is not u
+# is not used in training
+MODEL_PATH = "/Users/mher/Codes/ASDS21-CV/intelli-recon/logs/model/kaggle_experiment_depth_3/cd_20230110_163308_1.pth"
 show_examples = True
 OUTPUT_SHAPE = (512, 512)  # do not change for now
 
 # training parameters
 BATCH_SIZE = 64
-EPOCHS = 15
+EPOCHS = 50
 VALID_SIZE = 0.2
 LOSS = "BCELoss"  # do not change for now
 OPTIMIZER = "adam"  # do not change for now
@@ -25,13 +26,18 @@ MODEL_NAME = "resnet18"
 ENCODER_DEPTH = 5
 DECODER_CHANNELS = [256, 128, 64, 32, 16]
 
-data_path = Path("/Users/mher/Codes/ASDS21-CV/intelli-recon/data")
-log_path = Path("/Users/mher/Codes/ASDS21-CV/intelli-recon/logs/")
-os.makedirs(log_path, exist_ok=True)
+# logging params
+experiment_name = "kaggle_experiment_depth_5_deep"
 
 neptune_project_name = "mherkhachatryan/intelli-recon"
 neptune_config = "eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiI5MzM0ZThlNS1hZGUxLTRkOTQtYmQyYy1hYzEzM2U5MWUzODAifQ=="
 
+# path setting
+data_path = Path("/Users/mher/Codes/ASDS21-CV/intelli-recon/data")
+log_path = Path("/Users/mher/Codes/ASDS21-CV/intelli-recon/logs/")
+os.makedirs(log_path, exist_ok=True)
+
+# configurations that do not change
 # init neptune
 neptune_logger = neptune.init_run(
     project=neptune_project_name,
