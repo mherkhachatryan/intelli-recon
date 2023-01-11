@@ -1,12 +1,12 @@
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 
-from config.configs import *
-from config.experiment_tracking import tb_writer
+from configs import *
+from experiment_tracking import tb_writer
 from preprocessing import SentinelDataset, Preprocess
 from model import ChangeNet
 from training import TrainChangeDetection
-from config.configs import TrainParameters
+from configs import TrainParameters
 from utils import show_tensor
 
 # Getting ready the data

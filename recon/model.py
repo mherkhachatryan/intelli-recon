@@ -2,7 +2,7 @@ from torch import nn
 import segmentation_models_pytorch as smp
 import torch
 
-from config.configs import ModelParameters
+from configs import ModelParameters
 
 
 class ChangeNet(nn.Module):

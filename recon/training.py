@@ -8,8 +8,8 @@ from torchmetrics.classification import BinaryJaccardIndex, BinaryF1Score
 from typing import Tuple
 import os
 
-from config.configs import log_path, TrainParameters, experiment_name
-from config.experiment_tracking import tb_writer
+from configs import log_path, TrainParameters, experiment_name
+from experiment_tracking import tb_writer
 
 
 class TrainChangeDetection:
