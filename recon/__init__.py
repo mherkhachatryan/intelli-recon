@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 sys.path.append(str(Path.cwd() / "recon"))
+print(sys.path)
 
 import warnings
 
