@@ -16,6 +16,7 @@ class TrainChangeDetection:
     def __init__(self, train_params: TrainParameters, train_loader, val_loader):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = train_params.model
+        self.model.to(self.device)
         self.loss = train_params.loss
         self.optimizer = train_params.optimizer
         self.epochs = train_params.epochs
