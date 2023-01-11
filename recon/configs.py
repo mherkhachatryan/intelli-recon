@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 # path setting
-experiment_name = "test"
+experiment_name = "depth_3"
 data_path = Path("/content/drive/MyDrive/recon_training/data_light")
 log_path = Path("/content/drive/MyDrive/recon_training/logs/")
 os.makedirs(log_path, exist_ok=True)
@@ -15,12 +15,12 @@ OUTPUT_SHAPE = (512, 512)  # do not change for now
 
 # training parameters
 BATCH_SIZE = 64
-EPOCHS = 1
+EPOCHS = 80
 VALID_SIZE = 0.2
 LOSS = "BCELoss"  # do not change for now
 OPTIMIZER = "adam"  # do not change for now
 
 # MODEL PARAMETERS
 MODEL_NAME = "resnet18"
-ENCODER_DEPTH = 5
-DECODER_CHANNELS = [256, 128, 64, 32, 16]
+ENCODER_DEPTH = 3
+DECODER_CHANNELS = [64, 64, 16]
