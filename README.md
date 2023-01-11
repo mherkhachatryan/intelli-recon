@@ -9,7 +9,7 @@ the intelligent and advanced nature of the system, as well as its focus on recon
 ## Installation
 
 ```shell
-conda creante -n intelli-recon python=3.10
+conda creante -n intelli-recon python=3.8.16
 
 pip install git+https://github.com/mherkhachatryan/intelli-recon.git
 ```
