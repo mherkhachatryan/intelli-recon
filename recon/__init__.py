@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path.cwd() / "recon"))
+sys.path.append(str(Path(__file__).parent))
 print(sys.path)
 
 import warnings
