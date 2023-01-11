@@ -1,6 +1,10 @@
+from PIL import Image
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 from typing import List
 import torch
+import numpy as np
 
 
 def show_tensor(tensors: List[torch.Tensor], grid: bool = False, cmap: str = "gray"):
@@ -49,3 +53,20 @@ def show_tensor(tensors: List[torch.Tensor], grid: bool = False, cmap: str = "gr
         raise ValueError("Input is not a list of tensors or empty")
 
     plt.show()
+
+
+def tensor_to_numpy(tensor: torch.tensor) -> np.ndarray:
+    """Works for both cpu  and gpu tensors"""
+    if tensor.is_cuda:
+        return tensor.detach().cpu().numpy()
+    else:
+        return tensor.detach().numpy()
+
+
+def read_image(img_path: Path, label=False) -> Image:
+    if label:
+        image = Image.open(img_path).convert("RGB")
+    else:
+        image = Image.open(img_path)
+
+    return image  # noqa

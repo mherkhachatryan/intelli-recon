@@ -7,14 +7,7 @@ from torch.utils.data import Dataset
 
 from typing import List, Tuple
 
-
-def _read_image(img_path: Path, label=False) -> Image:
-    if label:
-        image = Image.open(img_path).convert("RGB")
-    else:
-        image = Image.open(img_path)
-
-    return image  # noqa
+from utils import read_image
 
 
 class Preprocess:
@@ -127,15 +120,15 @@ class SentinelDataset(Dataset):
         start_col = self.image_patches.loc[item_idx, "start_col"]
         end_col = self.image_patches.loc[item_idx, "end_col"]
 
-        image_1 = _read_image(path1)
+        image_1 = read_image(path1)
         image_1 = self._transform_image(image_1, output_shape=self.output_shape)
         image_1 = image_1[start_row:end_row, start_col:end_col]
 
-        image_2 = _read_image(path2)
+        image_2 = read_image(path2)
         image_2 = self._transform_image(image_2, output_shape=self.output_shape)
         image_2 = image_2[start_row:end_row, start_col:end_col]
 
-        label = _read_image(label_path, label=True)
+        label = read_image(label_path, label=True)
         label = self._transform_image(label, output_shape=self.output_shape, label=True)
         label = label[start_row:end_row, start_col:end_col]
 

@@ -8,21 +8,25 @@ from torchmetrics.classification import BinaryJaccardIndex, BinaryF1Score
 from typing import Tuple
 import os
 
-from configs import neptune_logger, tb_writer, log_path, TrainParameters, experiment_name
+from configs import log_path, experiment_name
+from validation import TrainParameters
+from experiment_tracking import tb_writer, neptune_logger
+from utils import tensor_to_numpy
 
 
 class TrainChangeDetection:
     def __init__(self, train_params: TrainParameters, train_loader, val_loader):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = train_params.model
+        self.model.to(self.device)
         self.loss = train_params.loss
         self.optimizer = train_params.optimizer
         self.epochs = train_params.epochs
 
         self.train_loader = train_loader
         self.val_loader = val_loader
-        self.iou_metric = BinaryJaccardIndex(threshold=0.5)
-        self.f1_metric = BinaryF1Score(threshold=0.5)
+        self.iou_metric = BinaryJaccardIndex(threshold=0.5).to(self.device)
+        self.f1_metric = BinaryF1Score(threshold=0.5).to(self.device)
 
         self.model_save_path = log_path / "model" / experiment_name
 
@@ -73,6 +77,11 @@ class TrainChangeDetection:
                 tb_writer.add_scalar('batch training f1',
                                      last_f1,
                                      epoch_idx * len(self.train_loader) + i)
+
+                neptune_logger["train/batch/loss"].log(last_loss)
+                neptune_logger["train/batch/iou"].log(last_iou)
+                neptune_logger["train/batch/f1"].log(last_f1)
+
             running_loss = 0.
             running_iou = 0.
             running_f1 = 0.
@@ -104,9 +113,9 @@ class TrainChangeDetection:
                 iou = self.iou_metric(val_output, target_val.int())
                 f1 = self.f1_metric(val_output, target_val.int())
 
-                running_val_loss.append(val_loss.detach().numpy())  # to keep array without gradient
-                running_val_iou.append(iou.detach().numpy())
-                running_val_f1.append(f1.detach().numpy())
+                running_val_loss.append(tensor_to_numpy(val_loss))  # to keep array without gradient
+                running_val_iou.append(tensor_to_numpy(iou))
+                running_val_f1.append(tensor_to_numpy(f1))
 
             avg_val_loss = np.mean(running_val_loss)
             avg_val_iou = np.mean(running_val_iou)
@@ -119,9 +128,9 @@ class TrainChangeDetection:
             tb_writer.add_scalar('training loss',
                                  avg_train_loss,
                                  epoch)
-            neptune_logger["training/loss/train"].log(avg_train_loss)
-            neptune_logger["training/loss/valid"].log(avg_val_loss)
 
+            neptune_logger["train/loss/"].log(avg_train_loss)
+            neptune_logger["valid/loss/"].log(avg_val_loss)
             # reporting metric
             tb_writer.add_scalar('training iou',
                                  avg_train_iou,
@@ -135,11 +144,10 @@ class TrainChangeDetection:
             tb_writer.add_scalar('validation f1',
                                  avg_val_f1,
                                  epoch)
-
-            neptune_logger["training/iou/train"].log(avg_train_iou)
-            neptune_logger["training/iou/valid"].log(avg_val_iou)
-            neptune_logger["training/f1/train"].log(avg_train_f1)
-            neptune_logger["training/f1/valid"].log(avg_val_f1)
+            neptune_logger["train/iou/"].log(avg_train_iou)
+            neptune_logger["valid/iou/"].log(avg_val_iou)
+            neptune_logger["train/f1/"].log(avg_train_f1)
+            neptune_logger["valid/f1/"].log(avg_val_f1)
 
             if avg_val_loss < best_val_loss:
                 best_val_loss = avg_val_loss
