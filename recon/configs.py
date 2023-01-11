@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import List
 
 # path setting
-data_path = Path("/Users/mher/Codes/ASDS21-CV/intelli-recon/data")
-log_path = Path("/Users/mher/Codes/ASDS21-CV/intelli-recon/logs/")
+data_path = Path("/content/drive/MyDrive/recon_training/data_light")
+log_path = Path("/content/drive/MyDrive/recon_training/logs/")
 os.makedirs(log_path, exist_ok=True)
 
 MODE = "train"  # valid, test, train
