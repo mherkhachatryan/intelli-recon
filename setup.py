@@ -27,5 +27,5 @@ setuptools.setup(
                       "tqdm==4.64.1",
                       "tensorboard==2.11.0"
                       ],
-    python_requires='==3.10.8'
+    python_requires='==3.8.16'
 )
