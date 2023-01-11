@@ -8,7 +8,8 @@ from torchmetrics.classification import BinaryJaccardIndex, BinaryF1Score
 from typing import Tuple
 import os
 
-from configs import neptune_logger, tb_writer, log_path, TrainParameters, experiment_name
+from config.configs import log_path, TrainParameters, experiment_name
+from config.experiment_tracking import tb_writer
 
 
 class TrainChangeDetection:
@@ -119,8 +120,6 @@ class TrainChangeDetection:
             tb_writer.add_scalar('training loss',
                                  avg_train_loss,
                                  epoch)
-            neptune_logger["training/loss/train"].log(avg_train_loss)
-            neptune_logger["training/loss/valid"].log(avg_val_loss)
 
             # reporting metric
             tb_writer.add_scalar('training iou',
@@ -136,11 +135,6 @@ class TrainChangeDetection:
                                  avg_val_f1,
                                  epoch)
 
-            neptune_logger["training/iou/train"].log(avg_train_iou)
-            neptune_logger["training/iou/valid"].log(avg_val_iou)
-            neptune_logger["training/f1/train"].log(avg_train_f1)
-            neptune_logger["training/f1/valid"].log(avg_val_f1)
-
             if avg_val_loss < best_val_loss:
                 best_val_loss = avg_val_loss
                 self._save_model(epoch)
@@ -150,7 +144,6 @@ class TrainChangeDetection:
         model_name = f'cd_{timestamp}_{epoch_idx}.pth'
         model_full_path = self.model_save_path / model_name
         torch.save(self.model.state_dict(), model_full_path)
-        neptune_logger["model_weights"].upload(str(model_full_path))
 
     def predict(self, dataset: Dataset = None, sample: int = 42):
         self.model.eval()

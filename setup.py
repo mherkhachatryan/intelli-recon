@@ -23,6 +23,5 @@ setuptools.setup(
                       "torch==1.13.0",
                       "torchmetrics==0.11.0",
                       "tqdm==4.64.1",
-                      "neptune-client==0.16.15",
                       ],
 )
