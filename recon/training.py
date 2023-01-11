@@ -23,8 +23,8 @@ class TrainChangeDetection:
 
         self.train_loader = train_loader
         self.val_loader = val_loader
-        self.iou_metric = BinaryJaccardIndex(threshold=0.5)
-        self.f1_metric = BinaryF1Score(threshold=0.5)
+        self.iou_metric = BinaryJaccardIndex(threshold=0.5).to(self.device)
+        self.f1_metric = BinaryF1Score(threshold=0.5).to(self.device)
 
         self.model_save_path = log_path / "model" / experiment_name
 
