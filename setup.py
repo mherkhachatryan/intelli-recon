@@ -25,7 +25,7 @@ setuptools.setup(
                       "torch==1.13.0",
                       "torchmetrics==0.11.0",
                       "tqdm==4.64.1",
-                      "tensorboard==2.11.0"
+                      "tensorboard==2.9"
                       ],
     python_requires='==3.8.16'
 )
