@@ -9,7 +9,7 @@ from typing import Tuple
 import os
 
 from configs import log_path, TrainParameters, experiment_name
-from experiment_tracking import tb_writer
+from experiment_tracking import tb_writer, neptune_logger
 from utils import tensor_to_numpy
 
 
@@ -76,6 +76,7 @@ class TrainChangeDetection:
                 tb_writer.add_scalar('batch training f1',
                                      last_f1,
                                      epoch_idx * len(self.train_loader) + i)
+
             running_loss = 0.
             running_iou = 0.
             running_f1 = 0.
@@ -123,6 +124,8 @@ class TrainChangeDetection:
                                  avg_train_loss,
                                  epoch)
 
+            neptune_logger["training/loss/train"].log(avg_train_loss)
+            neptune_logger["training/loss/valid"].log(avg_val_loss)
             # reporting metric
             tb_writer.add_scalar('training iou',
                                  avg_train_iou,
@@ -136,6 +139,10 @@ class TrainChangeDetection:
             tb_writer.add_scalar('validation f1',
                                  avg_val_f1,
                                  epoch)
+            neptune_logger["training/iou/train"].log(avg_train_iou)
+            neptune_logger["training/iou/valid"].log(avg_val_iou)
+            neptune_logger["training/f1/train"].log(avg_train_f1)
+            neptune_logger["training/f1/valid"].log(avg_val_f1)
 
             if avg_val_loss < best_val_loss:
                 best_val_loss = avg_val_loss
@@ -145,7 +152,6 @@ class TrainChangeDetection:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         model_name = f'cd_{timestamp}_{epoch_idx}.pth'
         model_full_path = self.model_save_path / model_name
-        print(model_full_path)
         torch.save(self.model.state_dict(), model_full_path)
 
 

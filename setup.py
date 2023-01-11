@@ -25,7 +25,8 @@ setuptools.setup(
                       "torch==1.13.0",
                       "torchmetrics==0.11.0",
                       "tqdm==4.64.1",
-                      "tensorboard==2.9"
+                      "tensorboard==2.9",
+                      "neptune-client==0.16.15"
                       ],
     python_requires='==3.8.16'
 )
