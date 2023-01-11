@@ -145,6 +145,7 @@ class TrainChangeDetection:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         model_name = f'cd_{timestamp}_{epoch_idx}.pth'
         model_full_path = self.model_save_path / model_name
+        print(model_full_path)
         torch.save(self.model.state_dict(), model_full_path)
 
 
