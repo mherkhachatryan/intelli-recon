@@ -1,12 +1,8 @@
-import torch
-from dataclasses import dataclass, field
-from torch import nn
 import os
 from pathlib import Path
 
-from typing import List
-
 # path setting
+experiment_name = "test"
 data_path = Path("/content/drive/MyDrive/recon_training/data_light")
 log_path = Path("/content/drive/MyDrive/recon_training/logs/")
 os.makedirs(log_path, exist_ok=True)
@@ -28,38 +24,3 @@ OPTIMIZER = "adam"  # do not change for now
 MODEL_NAME = "resnet18"
 ENCODER_DEPTH = 5
 DECODER_CHANNELS = [256, 128, 64, 32, 16]
-
-# logging params
-experiment_name = "kaggle_experiment_depth_5_deep"
-
-
-# configurations that do not change
-
-
-@dataclass
-class TrainParameters:
-    model: nn.Module = None
-    _loss: str = "BCEWithLogitsLoss"
-    _optimizer: str = "adam"
-    epochs: int = 5
-
-    @property
-    def loss(self):
-        if self._loss == "BCEWithLogitsLoss":
-            return nn.BCEWithLogitsLoss()
-        elif self._loss == "BCELoss":
-            return nn.BCELoss()
-        else:
-            raise ValueError(f"Invalid loss function: {self._loss}")
-
-    @property
-    def optimizer(self):
-        if self._optimizer.lower() == "adam":
-            return torch.optim.Adam(self.model.parameters(), lr=0.0001)
-
-
-@dataclass
-class ModelParameters:
-    model_name: str = "resnet18"
-    encoder_depth: int = 3
-    decoder_channels: List[int] = field(default_factory=lambda: [64, 64, 16])  # TODO LENGTH MUST BE ENCODER_DEPTH

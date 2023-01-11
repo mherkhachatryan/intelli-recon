@@ -28,5 +28,5 @@ setuptools.setup(
                       "tensorboard==2.9",
                       "neptune-client==0.16.15"
                       ],
-    python_requires='==3.8.16'
+    python_requires='>=3.8.16'
 )

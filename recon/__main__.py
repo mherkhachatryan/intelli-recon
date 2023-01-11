@@ -2,11 +2,11 @@ from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 
 from configs import *
-from experiment_tracking import tb_writer
+from experiment_tracking import tb_writer, neptune_logger
 from preprocessing import SentinelDataset, Preprocess
 from model import ChangeNet
 from training import TrainChangeDetection
-from configs import TrainParameters
+from validation import TrainParameters, ModelParameters
 from utils import show_tensor
 
 # Getting ready the data
@@ -36,6 +36,11 @@ image_1, image_2, label = next(dataiter)
 
 tb_writer.add_graph(model, (image_1, image_2))
 tb_writer.close()
+
+neptune_logger["config/dataset/train_size"] = len(patches_df_train)
+neptune_logger["config/dataset/valid_size"] = len(patches_df_test)
+neptune_logger["config/model_params"] = model_params.__dict__
+neptune_logger["config/training_params"] = train_params.__dict__
 
 if MODE == "train":
     training.train()

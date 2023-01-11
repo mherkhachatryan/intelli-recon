@@ -1,3 +1,6 @@
+from PIL import Image
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 from typing import List
 import torch
@@ -58,3 +61,12 @@ def tensor_to_numpy(tensor: torch.tensor) -> np.ndarray:
         return tensor.detach().cpu().numpy()
     else:
         return tensor.detach().numpy()
+
+
+def read_image(img_path: Path, label=False) -> Image:
+    if label:
+        image = Image.open(img_path).convert("RGB")
+    else:
+        image = Image.open(img_path)
+
+    return image  # noqa
