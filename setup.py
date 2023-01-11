@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name='intelli-recon',
-    version='0.0.3',
+    version='0.0.3',  # TODO add version to init
     author='Mher Khachatryan',
     author_email='mher.khachatryan4@edu.ysu.am',
     description='Intelli Recon, ASDS21 CV',
@@ -15,7 +15,7 @@ setuptools.setup(
     license='',
     packages=['recon'],
     install_requires=['matplotlib>=3.1.1',
-                      "numpy==1.20.3",
+                      "numpy>=1.21.0",
                       "pandas==1.5.2",
                       "Pillow==9.4.0",
                       "scikit_learn==1.2.0",
