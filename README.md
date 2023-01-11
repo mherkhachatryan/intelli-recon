@@ -11,7 +11,7 @@ the intelligent and advanced nature of the system, as well as its focus on recon
 ```shell
 conda creante -n intelli-recon python=3.10
 
-pip install -r requirements.txt
+pip install git+https://github.com/mherkhachatryan/intelli-recon.git
 ```
 
 ## Configuration
