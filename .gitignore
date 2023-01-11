@@ -58,3 +58,4 @@ docs/_build/
 /logs/
 /runs/
 .neptune/
+/data_light/

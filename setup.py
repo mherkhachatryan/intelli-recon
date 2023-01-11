@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name='intelli-recon',
-    version='0.0.2',
+    version='0.0.3',
     author='Mher Khachatryan',
     author_email='mher.khachatryan4@edu.ysu.am',
     description='Intelli Recon, ASDS21 CV',
