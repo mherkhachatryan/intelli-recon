@@ -10,6 +10,7 @@ import os
 
 from configs import log_path, TrainParameters, experiment_name
 from experiment_tracking import tb_writer
+from utils import tensor_to_numpy
 
 
 class TrainChangeDetection:
@@ -106,9 +107,9 @@ class TrainChangeDetection:
                 iou = self.iou_metric(val_output, target_val.int())
                 f1 = self.f1_metric(val_output, target_val.int())
 
-                running_val_loss.append(val_loss.detach().numpy())  # to keep array without gradient
-                running_val_iou.append(iou.detach().numpy())
-                running_val_f1.append(f1.detach().numpy())
+                running_val_loss.append(tensor_to_numpy(val_loss))  # to keep array without gradient
+                running_val_iou.append(tensor_to_numpy(iou))
+                running_val_f1.append(tensor_to_numpy(f1))
 
             avg_val_loss = np.mean(running_val_loss)
             avg_val_iou = np.mean(running_val_iou)
@@ -146,16 +147,18 @@ class TrainChangeDetection:
         model_full_path = self.model_save_path / model_name
         torch.save(self.model.state_dict(), model_full_path)
 
-    def predict(self, dataset: Dataset = None, sample: int = 42):
-        self.model.eval()
-        with torch.no_grad():
-            input_image_1 = dataset[sample][0].unsqueeze(dim=0).to(self.device)
-            input_image_2 = dataset[sample][1].unsqueeze(dim=0).to(self.device)
-            logits = self.model(input_image_1, input_image_2)
 
-            prediction_mask = torch.sigmoid(logits).squeeze()
+def predict(self, dataset: Dataset = None, sample: int = 42):
+    self.model.eval()
+    with torch.no_grad():
+        input_image_1 = dataset[sample][0].unsqueeze(dim=0).to(self.device)
+        input_image_2 = dataset[sample][1].unsqueeze(dim=0).to(self.device)
+        logits = self.model(input_image_1, input_image_2)
 
-            return prediction_mask
+        prediction_mask = torch.sigmoid(logits).squeeze()
 
-    def load_model(self, path: str):
-        self.model.load_state_dict(torch.load(path))
+        return prediction_mask
+
+
+def load_model(self, path: str):
+    self.model.load_state_dict(torch.load(path))
