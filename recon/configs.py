@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 # path setting
-experiment_name = "depth_3_resnet50_thresh_0546"
+experiment_name = "depth_5_resnet50_thresh_0546"
 data_path = Path("/content/drive/MyDrive/recon_training/data_light")
 log_path = Path("/content/drive/MyDrive/recon_training/logs/")
 os.makedirs(log_path, exist_ok=True)
@@ -23,5 +23,5 @@ SEGMENTATION_THRESHOLD = 0.546
 
 # MODEL PARAMETERS
 MODEL_NAME = "resnet50"
-ENCODER_DEPTH = 3
-DECODER_CHANNELS = [64, 64, 16]
+ENCODER_DEPTH = 5
+DECODER_CHANNELS = [256, 128, 64, 32, 16]
