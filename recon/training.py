@@ -155,10 +155,12 @@ class TrainChangeDetection:
 
     def _save_model(self, epoch_idx):
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        model_name = f'cd_{timestamp}_{epoch_idx}.pth'
+        model_name = f'cd_best_model.pth'
         model_full_path = self.model_save_path / model_name
         torch.save(self.model.state_dict(), model_full_path)
-        neptune_logger["model_weights"].upload(str(model_full_path))
+        neptune_logger["best_model/epoch"] = epoch_idx
+        neptune_logger["best_model/timestamp"] = timestamp
+        neptune_logger["best_model/model_weights"].upload(str(model_full_path))
 
     def predict(self, dataset: Dataset = None, sample: int = 42) -> torch.tensor:
         """Evaluate model on given dataset for single given dataset.
