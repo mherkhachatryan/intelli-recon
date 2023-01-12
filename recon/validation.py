@@ -11,6 +11,7 @@ class TrainParameters:
     _loss: str = "BCEWithLogitsLoss"
     _optimizer: str = "adam"
     epochs: int = 5
+    segmentation_threshold: float = 0.55
 
     @property
     def loss(self):

@@ -22,6 +22,7 @@ class TrainChangeDetection:
         self.loss = train_params.loss
         self.optimizer = train_params.optimizer
         self.epochs = train_params.epochs
+        self.segmentation_threshold = train_params.segmentation_threshold
 
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -160,16 +161,28 @@ class TrainChangeDetection:
         torch.save(self.model.state_dict(), model_full_path)
         neptune_logger["model_weights"].upload(str(model_full_path))
 
-    def predict(self, dataset: Dataset = None, sample: int = 42):
+    def predict(self, dataset: Dataset = None, sample: int = 42) -> torch.tensor:
+        """Evaluate model on given dataset for single given dataset.
+
+        Parameters
+        ----------
+        dataset
+        sample
+
+        Returns
+        -------
+            Binary segmentation mask
+        """
         self.model.eval()
         with torch.no_grad():
             input_image_1 = dataset[sample][0].unsqueeze(dim=0).to(self.device)
             input_image_2 = dataset[sample][1].unsqueeze(dim=0).to(self.device)
             logits = self.model(input_image_1, input_image_2)
 
-            prediction_mask = torch.sigmoid(logits).squeeze()
-
-            return prediction_mask
+            mask = torch.sigmoid(logits).squeeze()
+            binary_mask = torch.where(mask >= self.segmentation_threshold, torch.tensor(1, dtype=torch.uint8),
+                                      torch.tensor(0, dtype=torch.uint8))
+            return binary_mask
 
     def load_model(self, path: str):
-        self.model.load_state_dict(torch.load(path))
+        self.model.load_state_dict(torch.load(path, map_location=self.device))
