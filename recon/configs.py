@@ -15,7 +15,7 @@ OUTPUT_SHAPE = (512, 512)  # do not change for now
 
 # training parameters
 BATCH_SIZE = 64
-EPOCHS = 80
+EPOCHS = 120
 VALID_SIZE = 0.2
 LOSS = "BCELoss"  # do not change for now
 OPTIMIZER = "adam"  # do not change for now
