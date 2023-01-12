@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 # path setting
-experiment_name = "colab_exp6"
+experiment_name = "colab_exp5"
 data_path = Path("/content/drive/MyDrive/recon_training/data_light")
 log_path = Path("/content/drive/MyDrive/recon_training/logs/")
 os.makedirs(log_path, exist_ok=True)
