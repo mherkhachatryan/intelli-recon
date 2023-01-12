@@ -1,5 +1,5 @@
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 import numpy as np
 from datetime import datetime
@@ -15,7 +15,7 @@ from utils import tensor_to_numpy
 
 
 class TrainChangeDetection:
-    def __init__(self, train_params: TrainParameters, train_loader, val_loader):
+    def __init__(self, train_params: TrainParameters):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = train_params.model
         self.model.to(self.device)
@@ -24,16 +24,14 @@ class TrainChangeDetection:
         self.epochs = train_params.epochs
         self.segmentation_threshold = train_params.segmentation_threshold
 
-        self.train_loader = train_loader
-        self.val_loader = val_loader
-        self.iou_metric = BinaryJaccardIndex(threshold=0.5).to(self.device)
-        self.f1_metric = BinaryF1Score(threshold=0.5).to(self.device)
+        self.iou_metric = BinaryJaccardIndex(threshold=self.segmentation_threshold).to(self.device)
+        self.f1_metric = BinaryF1Score(threshold=self.segmentation_threshold).to(self.device)
 
         self.model_save_path = log_path / "model" / experiment_name
 
         os.makedirs(self.model_save_path, exist_ok=True)
 
-    def _train_one_epoch(self, epoch_idx: int) -> Tuple[float, float, float]:
+    def _train_one_epoch(self, epoch_idx: int, train_loader: DataLoader) -> Tuple[float, float, float]:
         running_loss = 0.
         last_loss = 0.
 
@@ -43,7 +41,7 @@ class TrainChangeDetection:
         running_f1 = 0.
         last_f1 = 0.
 
-        for i, data in tqdm(enumerate(self.train_loader), total=len(self.train_loader)):
+        for i, data in tqdm(enumerate(train_loader), total=len(train_loader)):
             image_1, image_2, target = data
             image_1, image_2, target = image_1.to(self.device), image_2.to(self.device), target.to(self.device)
 
@@ -62,7 +60,7 @@ class TrainChangeDetection:
             running_iou += self.iou_metric(outputs, target.int())
             running_f1 += self.f1_metric(outputs, target.int())
 
-            reporting_batch_size = len(self.train_loader) // 4
+            reporting_batch_size = len(train_loader) // 4
             if i % reporting_batch_size == reporting_batch_size - 1:
                 last_loss = running_loss / reporting_batch_size  # gather data every reporting_batch_size mini-batch
                 last_iou = running_iou / reporting_batch_size
@@ -70,14 +68,14 @@ class TrainChangeDetection:
 
                 tb_writer.add_scalar('batch training loss',
                                      last_loss,
-                                     epoch_idx * len(self.train_loader) + i)
+                                     epoch_idx * len(train_loader) + i)
                 tb_writer.add_scalar('batch training iou',
                                      last_iou,
-                                     epoch_idx * len(self.train_loader) + i)
+                                     epoch_idx * len(train_loader) + i)
 
                 tb_writer.add_scalar('batch training f1',
                                      last_f1,
-                                     epoch_idx * len(self.train_loader) + i)
+                                     epoch_idx * len(train_loader) + i)
 
                 neptune_logger["train/batch/loss"].log(last_loss)
                 neptune_logger["train/batch/iou"].log(last_iou)
@@ -89,20 +87,21 @@ class TrainChangeDetection:
 
         return last_loss, last_iou, last_f1
 
-    def train(self):  # TODO add option to reload training
+    def fit(self, train_loader: DataLoader = None,
+            val_loader: DataLoader = None):  # TODO add option to reload training
         best_val_loss = 1e6
 
         for epoch in tqdm(range(self.epochs)):
             self.model.train(True)
 
-            avg_train_loss, avg_train_iou, avg_train_f1 = self._train_one_epoch(epoch)
+            avg_train_loss, avg_train_iou, avg_train_f1 = self._train_one_epoch(epoch, train_loader)
             self.model.train(False)
 
             running_val_loss = []
             running_val_iou = []
             running_val_f1 = []
 
-            for val_data in tqdm(self.val_loader, total=len(self.val_loader)):
+            for val_data in tqdm(val_loader, total=len(val_loader)):
                 image_1_val, image_2_val, target_val = val_data
                 image_1_val, image_2_val, target_val = image_1_val.to(self.device), image_2_val.to(
                     self.device), target_val.to(self.device)
@@ -177,9 +176,8 @@ class TrainChangeDetection:
         with torch.no_grad():
             input_image_1 = dataset[sample][0].unsqueeze(dim=0).to(self.device)
             input_image_2 = dataset[sample][1].unsqueeze(dim=0).to(self.device)
-            logits = self.model(input_image_1, input_image_2)
+            mask = self.model(input_image_1, input_image_2).squeeze()
 
-            mask = torch.sigmoid(logits).squeeze()
             binary_mask = torch.where(mask >= self.segmentation_threshold, torch.tensor(1, dtype=torch.uint8),
                                       torch.tensor(0, dtype=torch.uint8))
             return binary_mask

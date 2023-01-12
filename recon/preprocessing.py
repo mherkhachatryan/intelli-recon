@@ -19,17 +19,22 @@ class Preprocess:
         self.__train_file_path = self.images_path / "train.txt"
         self.__test_files_path = self.images_path / "test.txt"
         self.train_city_names = list(pd.read_csv(self.__train_file_path).columns)
+        self.test_city_names = list(pd.read_csv(self.__test_files_path).columns)
 
-    def _get_image_pairs_paths(self, city_name: str) -> Tuple[Path,
-                                                              Path,
-                                                              Path]:
+    def _get_image_pairs_paths(self, city_name: str, mode=None) -> Tuple[Path,
+                                                                         Path,
+                                                                         Path | str]:
         city_path = self.images_path / city_name / "pair"
         image_1 = city_path / "img1.png"
         image_2 = city_path / "img2.png"
+        if mode == "test":
+            label = ""
+        elif mode in ["valid", "train"]:
+            label = self.train_label_path / city_name / "cm" / "cm.png"
+        else:
+            ValueError(f"Undefined mode: {mode}")
 
-        label = self.train_label_path / city_name / "cm" / "cm.png"
-
-        return image_1, image_2, label
+        return image_1, image_2, label  # noqa
 
     def get_all_image_pairs_paths(self, cities: List[str]) -> Tuple[List[Path],
                                                                     List[Path],
@@ -38,7 +43,7 @@ class Preprocess:
         images_2 = []
         labels = []
         for city in cities:
-            image_1, image_2, label = self._get_image_pairs_paths(city)
+            image_1, image_2, label = self._get_image_pairs_paths(city, mode=mode)
             images_1.append(image_1)
             images_2.append(image_2)
             labels.append(label)
@@ -92,9 +97,9 @@ class Preprocess:
         DataFrame of patch information
         """
         if mode.lower() in ["train", "valid"]:
-            image_1, image_2, label = self.get_all_image_pairs_paths(self.train_city_names)
+            image_1, image_2, label = self.get_all_image_pairs_paths(self.train_city_names, mode=mode)
         elif mode.lower() == "test":
-            raise NotImplemented("Waiting for train")
+            image_1, image_2, label = self.get_all_image_pairs_paths(self.test_city_names, mode=mode)
         else:
             raise ValueError("Wrong mode")
 
