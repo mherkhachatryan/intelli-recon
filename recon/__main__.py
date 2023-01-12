@@ -27,7 +27,8 @@ model_params = ModelParameters(model_name=MODEL_NAME, encoder_depth=ENCODER_DEPT
 model = ChangeNet(model_params=model_params)
 
 # getting ready training
-train_params = TrainParameters(model=model, _loss=LOSS, _optimizer=OPTIMIZER, epochs=EPOCHS)
+train_params = TrainParameters(model=model, _loss=LOSS, _optimizer=OPTIMIZER, epochs=EPOCHS,
+                               segmentation_threshold=SEGMENTATION_THRESHOLD)
 training = TrainChangeDetection(train_params, train_loader, val_loader)
 
 # pass sample to model to log in tensorboard
