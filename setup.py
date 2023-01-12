@@ -19,7 +19,7 @@ setuptools.setup(
     install_requires=['matplotlib>=3.1.1',
                       "numpy==1.21.0",
                       "pandas==1.5.2",
-                      "Pillow==9.0.0g",
+                      "Pillow==9.0.0",
                       "scikit_learn==1.2.0",
                       "segmentation_models_pytorch==0.3.1",
                       "torch==1.13.0",
