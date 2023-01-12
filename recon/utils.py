@@ -65,6 +65,8 @@ def tensor_to_numpy(tensor: torch.tensor) -> np.ndarray:
 
 def read_image(img_path: Path, label=False) -> Image:
     if label:
+        if img_path == "":
+            return Image.fromarray(np.zeros(shape=((512, 512, 3))), 'RGB')  # dummy array
         image = Image.open(img_path).convert("RGB")
     else:
         image = Image.open(img_path)
