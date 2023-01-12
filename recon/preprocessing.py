@@ -36,9 +36,9 @@ class Preprocess:
 
         return image_1, image_2, label  # noqa
 
-    def get_all_image_pairs_paths(self, cities: List[str]) -> Tuple[List[Path],
-                                                                    List[Path],
-                                                                    List[Path]]:
+    def get_all_image_pairs_paths(self, cities: List[str], mode=None) -> Tuple[List[Path],
+                                                                               List[Path],
+                                                                               List[Path]]:
         images_1 = []
         images_2 = []
         labels = []
