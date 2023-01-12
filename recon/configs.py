@@ -19,7 +19,7 @@ EPOCHS = 120
 VALID_SIZE = 0.2
 LOSS = "BCELoss"  # do not change for now
 OPTIMIZER = "adam"  # do not change for now
-SEGMENTATION_THRESHOLD = 0.546
+SEGMENTATION_THRESHOLD = 0.5
 
 # MODEL PARAMETERS
 MODEL_NAME = "resnet152"
