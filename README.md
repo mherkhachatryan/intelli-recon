@@ -6,6 +6,17 @@ the intelligent and advanced nature of the system, as well as its focus on recon
 
 # Usage
 
+## Data 
+You can find dataset in this [link](https://www.kaggle.com/code/aninda/change-detection-nb/data). 
+For Data keep this structure. 
+```shell
+--data
+----images
+---- # folders with city names etc. 
+----train_labels
+---- # folders with city names etc.
+```
+
 ## Installation
 
 ```shell
@@ -26,3 +37,9 @@ From repo level (`intelli-recon/` ) run
 ```shell
 python recon/
 ```
+
+# Model Weights
+Best model's configurations and weights can be found at this [link](https://app.neptune.ai/mherkhachatryan/intelli-recon/experiments?split=tbl&dash=charts&viewId=983493ff-7039-4975-a552-be0e058b84fd)
+with tag `final`. You can track other experiments here too. 
+
+To test model, in `config.py` pass  `MODE` to `valid` or `test`. 

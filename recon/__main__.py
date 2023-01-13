@@ -8,6 +8,7 @@ from model import ChangeNet
 from training import TrainChangeDetection
 from validation import TrainParameters, ModelParameters
 from utils import show_tensor
+import random
 
 # Getting ready the data
 proc = Preprocess(data_path)
@@ -47,14 +48,16 @@ if MODE in ["valid", "train"]:
 
     elif MODE == "valid":
         if show_examples:  # TODO add tensorboard
-            sample = 4
-            image_1 = val_ds[sample][0]
-            image_2 = val_ds[sample][1]
-            gd = val_ds[sample][2]
-            training.load_model(MODEL_PATH)
-            mask = training.predict(val_ds, sample=sample)
+            
+            for _ in range(5):
+                sample = random.randint(0, len(val_ds))
+                image_1 = val_ds[sample][0]
+                image_2 = val_ds[sample][1]
+                gd = val_ds[sample][2]
+                training.load_model(MODEL_PATH)
+                mask = training.predict(val_ds, sample=sample)
 
-            show_tensor([image_1, image_2, gd, mask], grid=True)
+                show_tensor([image_1, image_2, gd, mask], grid=True)
 
 
 elif MODE == "test":
