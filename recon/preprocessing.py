@@ -23,7 +23,7 @@ class Preprocess:
 
     def _get_image_pairs_paths(self, city_name: str, mode=None) -> Tuple[Path,
                                                                          Path,
-                                                                         Path | str]:
+                                                                         Path]:
         city_path = self.images_path / city_name / "pair"
         image_1 = city_path / "img1.png"
         image_2 = city_path / "img2.png"
